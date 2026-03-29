@@ -1,9 +1,27 @@
 const express = require('express');
 const router = express.Router();
+const { protect } = require('../middleware/auth');
+const {
+  submitFeedback,
+  getAllFeedback,
+  getFeedbackById,
+  updateFeedbackStatus,
+  deleteFeedback,
+  getAISummary,
+  reanalyzeWithAI,
+  getStats,
+} = require('../controllers/feedbackController');
 
-// Routes will be added in Step 2
-router.get('/test', (req, res) => {
-  res.json({ success: true, message: 'Feedback route works' });
-});
+// Public
+router.post('/', submitFeedback);
+
+// Admin only
+router.get('/summary', protect, getAISummary);
+router.get('/stats', protect, getStats);
+router.get('/', protect, getAllFeedback);
+router.get('/:id', protect, getFeedbackById);
+router.patch('/:id', protect, updateFeedbackStatus);
+router.delete('/:id', protect, deleteFeedback);
+router.post('/:id/reanalyze', protect, reanalyzeWithAI);
 
 module.exports = router;
