@@ -1,5 +1,8 @@
 const Feedback = require('../models/Feedback');
 const { analyzeWithGemini } = require('../services/gemini.service');
+const Groq = require('groq-sdk');
+
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 // @route   POST /api/feedback
 // @access  Public
@@ -7,7 +10,6 @@ const submitFeedback = async (req, res) => {
   try {
     const { title, description, category, submitterName, submitterEmail } = req.body;
 
-    // Input sanitisation
     if (!title || !description || !category) {
       return res.status(400).json({
         success: false,
@@ -54,7 +56,7 @@ const submitFeedback = async (req, res) => {
       submitterEmail: submitterEmail ? submitterEmail.trim() : undefined,
     });
 
-    // Call Gemini AI — feedback is saved even if AI fails
+    // Call AI — feedback is saved even if AI fails
     const aiResult = await analyzeWithGemini(title, description);
 
     if (aiResult.success && aiResult.data) {
@@ -98,11 +100,9 @@ const getAllFeedback = async (req, res) => {
 
     const query = {};
 
-    // Filters
     if (category) query.category = category;
     if (status) query.status = status;
 
-    // Search
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
@@ -110,13 +110,11 @@ const getAllFeedback = async (req, res) => {
       ];
     }
 
-    // Sorting
-    let sortOption = { createdAt: -1 }; // default: newest first
+    let sortOption = { createdAt: -1 };
     if (sort === 'priority') sortOption = { ai_priority: -1 };
     if (sort === 'sentiment') sortOption = { ai_sentiment: 1 };
     if (sort === 'date_asc') sortOption = { createdAt: 1 };
 
-    // Pagination
     const skip = (Number(page) - 1) * Number(limit);
     const total = await Feedback.countDocuments(query);
 
@@ -171,10 +169,6 @@ const getAISummary = async (req, res) => {
       .map((f) => `- ${f.title}: ${f.ai_summary}`)
       .join('\n');
 
-    const { GoogleGenerativeAI } = require('@google/generative-ai');
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
     const prompt = `Based on these product feedback summaries from the last 7 days, identify the top 3 themes. Return ONLY valid JSON with no markdown:
 {
   "themes": [
@@ -187,8 +181,13 @@ const getAISummary = async (req, res) => {
 Feedback:
 ${feedbackText}`;
 
-    const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
+    const completion = await groq.chat.completions.create({
+      messages: [{ role: 'user', content: prompt }],
+      model: 'llama-3.1-8b-instant',
+      temperature: 0.3,
+    });
+
+    const text = completion.choices[0].message.content.trim();
     const cleaned = text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(cleaned);
 

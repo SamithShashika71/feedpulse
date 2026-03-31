@@ -29,7 +29,7 @@ const feedbackLimiter = rateLimit({
 });
 
 // Routes
-app.use('/api/feedback', feedbackLimiter);
+// Routes
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/auth', authRoutes);
 

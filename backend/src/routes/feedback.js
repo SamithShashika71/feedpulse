@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const { protect } = require('../middleware/auth');
 const {
   submitFeedback,
@@ -12,8 +13,19 @@ const {
   getStats,
 } = require('../controllers/feedbackController');
 
-// Public
-router.post('/', submitFeedback);
+const feedbackLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: {
+    success: false,
+    data: null,
+    error: 'Too Many Requests',
+    message: 'Too many submissions from this IP. Please try again after an hour.',
+  },
+});
+
+// Public — rate limited
+router.post('/', feedbackLimiter, submitFeedback);
 
 // Admin only
 router.get('/summary', protect, getAISummary);
