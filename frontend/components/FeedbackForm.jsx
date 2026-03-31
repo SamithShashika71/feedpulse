@@ -37,7 +37,13 @@ export default function FeedbackForm() {
     try {
       await api.post('/api/feedback', form);
       setSuccess(true);
-      setForm({ title: '', description: '', category: 'Feature Request', submitterName: '', submitterEmail: '' });
+      setForm({
+        title: '',
+        description: '',
+        category: 'Feature Request',
+        submitterName: '',
+        submitterEmail: '',
+      });
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong. Please try again.');
     } finally {
@@ -67,13 +73,24 @@ export default function FeedbackForm() {
     fontFamily: 'DM Sans, sans-serif',
   };
 
+  const goHomeLinkStyle = {
+    background: 'transparent',
+    border: '1px solid #1e2d42',
+    color: '#8a9bb5',
+    padding: '12px 24px',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    fontFamily: 'DM Sans, sans-serif',
+    fontWeight: '600',
+    fontSize: '14px',
+    textDecoration: 'none',
+    display: 'inline-flex',
+    alignItems: 'center',
+  };
+
   if (success) {
     return (
-      <div style={{
-        textAlign: 'center',
-        padding: '48px 32px',
-        animation: 'fadeInUp 0.5s ease forwards',
-      }}>
+      <div style={{ textAlign: 'center', padding: '48px 32px' }}>
         <div style={{
           width: '72px',
           height: '72px',
@@ -87,30 +104,46 @@ export default function FeedbackForm() {
           fontSize: '32px',
           color: '#00e5a0',
           boxShadow: '0 0 20px rgba(0, 229, 160, 0.3)',
-        }}>✓</div>
-        <h2 style={{ fontFamily: 'Sora, sans-serif', fontSize: '24px', color: '#f0f4ff', marginBottom: '12px' }}>
+        }}>
+          &#10003;
+        </div>
+        <h2 style={{
+          fontFamily: 'Sora, sans-serif',
+          fontSize: '24px',
+          color: '#f0f4ff',
+          marginBottom: '12px',
+        }}>
           Feedback Received!
         </h2>
-        <p style={{ color: '#8a9bb5', marginBottom: '32px', lineHeight: '1.6' }}>
+        <p style={{
+          color: '#8a9bb5',
+          marginBottom: '32px',
+          lineHeight: '1.6',
+          fontFamily: 'DM Sans, sans-serif',
+        }}>
           Thank you! Your feedback has been submitted and our AI is already analyzing it.
         </p>
-        <button
-          onClick={() => setSuccess(false)}
-          style={{
-            background: 'rgba(0, 212, 255, 0.1)',
-            border: '1px solid rgba(0, 212, 255, 0.3)',
-            color: '#00d4ff',
-            padding: '12px 32px',
-            borderRadius: '10px',
-            cursor: 'pointer',
-            fontFamily: 'DM Sans, sans-serif',
-            fontWeight: '600',
-            fontSize: '14px',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          Submit Another
-        </button>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+          <button
+            onClick={() => setSuccess(false)}
+            style={{
+              background: 'rgba(0, 212, 255, 0.1)',
+              border: '1px solid rgba(0, 212, 255, 0.3)',
+              color: '#00d4ff',
+              padding: '12px 24px',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontFamily: 'DM Sans, sans-serif',
+              fontWeight: '600',
+              fontSize: '14px',
+            }}
+          >
+            Submit Another
+          </button>
+          <a href="/" style={goHomeLinkStyle}>
+            Go Home
+          </a>
+        </div>
       </div>
     );
   }
@@ -177,62 +210,65 @@ export default function FeedbackForm() {
         </p>
       </div>
 
-     {/* Category */}
-<div>
-  <label style={labelStyle}>Category <span style={{ color: '#ff4d6d' }}>*</span></label>
-  <div style={{ position: 'relative' }}>
-    <select
-      name="category"
-      value={form.category}
-      onChange={handleChange}
-      style={{
-        ...inputStyle,
-        cursor: 'pointer',
-        paddingRight: '40px',
-        appearance: 'none',
-        WebkitAppearance: 'none',
-      }}
-      onFocus={e => {
-        e.target.style.borderColor = '#00d4ff';
-        e.target.style.boxShadow = '0 0 0 3px rgba(0, 212, 255, 0.1)';
-      }}
-      onBlur={e => {
-        e.target.style.borderColor = '#1e2d42';
-        e.target.style.boxShadow = 'none';
-      }}
-    >
-      <option value="Feature Request">Feature Request</option>
-      <option value="Bug">Bug</option>
-      <option value="Improvement">Improvement</option>
-      <option value="Other">Other</option>
-    </select>
-    {/* Custom arrow */}
-    <svg
-      style={{
-        position: 'absolute',
-        right: '16px',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        pointerEvents: 'none',
-      }}
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#8a9bb5"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="6 9 12 15 18 9" />
-      </svg>
-    </div>
-</div>
+      {/* Category */}
+      <div>
+        <label style={labelStyle}>
+          Category <span style={{ color: '#ff4d6d' }}>*</span>
+        </label>
+        <div style={{ position: 'relative' }}>
+          <select
+            name="category"
+            value={form.category}
+            onChange={handleChange}
+            style={{
+              ...inputStyle,
+              cursor: 'pointer',
+              paddingRight: '40px',
+              appearance: 'none',
+              WebkitAppearance: 'none',
+            }}
+            onFocus={e => {
+              e.target.style.borderColor = '#00d4ff';
+              e.target.style.boxShadow = '0 0 0 3px rgba(0, 212, 255, 0.1)';
+            }}
+            onBlur={e => {
+              e.target.style.borderColor = '#1e2d42';
+              e.target.style.boxShadow = 'none';
+            }}
+          >
+            <option value="Feature Request">Feature Request</option>
+            <option value="Bug">Bug</option>
+            <option value="Improvement">Improvement</option>
+            <option value="Other">Other</option>
+          </select>
+          <svg
+            style={{
+              position: 'absolute',
+              right: '16px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              pointerEvents: 'none',
+            }}
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#8a9bb5"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </div>
+      </div>
 
       {/* Name + Email */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
         <div>
-          <label style={labelStyle}>Name <span style={{ color: '#4a5a72', fontSize: '11px' }}>(optional)</span></label>
+          <label style={labelStyle}>
+            Name <span style={{ color: '#4a5a72', fontSize: '11px' }}>(optional)</span>
+          </label>
           <input
             type="text"
             name="submitterName"
@@ -251,7 +287,9 @@ export default function FeedbackForm() {
           />
         </div>
         <div>
-          <label style={labelStyle}>Email <span style={{ color: '#4a5a72', fontSize: '11px' }}>(optional)</span></label>
+          <label style={labelStyle}>
+            Email <span style={{ color: '#4a5a72', fontSize: '11px' }}>(optional)</span>
+          </label>
           <input
             type="email"
             name="submitterEmail"
