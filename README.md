@@ -131,7 +131,7 @@ feedpulse/
 
 ### Step 1 — Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/feedpulse.git
+git clone https://github.com/samith-shashika/feedpulse.git
 cd feedpulse
 ```
 
